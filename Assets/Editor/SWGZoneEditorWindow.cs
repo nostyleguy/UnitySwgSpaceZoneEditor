@@ -26,6 +26,7 @@ public class SWGZoneEditorWindow : EditorWindow
         // Get existing open window or if none, make a new one:
         SWGZoneEditorWindow window = (SWGZoneEditorWindow)EditorWindow.GetWindow(typeof(SWGZoneEditorWindow));
         window.Show();
+
     }
 
     [MenuItem("SWG/DistanceTo")]
@@ -60,7 +61,12 @@ public class SWGZoneEditorWindow : EditorWindow
 
     void OnGUI()
     {
-        if(GUILayout.Button("Load File"))
+        if (ZoneObjects == null)
+        {
+            ZoneObjects = new List<ZoneObject>();
+        }
+
+        if (GUILayout.Button("Load File"))
         {
             myString = EditorUtility.OpenFilePanel("Overwrite with tab", "", "tab");
             if (myString.Length != 0)
@@ -184,6 +190,11 @@ public class SWGZoneEditorWindow : EditorWindow
 
     void OnSceneGUI(SceneView sceneView)
     {
+        if(ZoneObjects == null)
+        {
+            ZoneObjects = new List<ZoneObject>();
+        }
+
         if (SceneView.lastActiveSceneView != null)
         {
             Handles.color = Color.black;
