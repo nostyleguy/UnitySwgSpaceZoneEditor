@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System;
-using System.Linq;
+using System.Linq; 
 
 [ExecuteInEditMode]
 public class ZoneObject : MonoBehaviour
@@ -72,7 +72,34 @@ public class ZoneObject : MonoBehaviour
             fltPX = float.Parse(terms[7]);
             fltPY = float.Parse(terms[8]);
             fltPZ = float.Parse(terms[9]);
-            
+
+            Vector3 vctK = new Vector3(fltKX, fltKY, fltKZ);
+            Vector3 vctJ = new Vector3(fltJX, fltJY, fltJZ);
+            Vector3 vctI = Vector3.Cross(vctJ, vctK);
+            vctJ = Vector3.Cross(vctK, vctI);
+
+            Matrix4x4 matrix = new Matrix4x4();
+
+            matrix.m00 = vctI.x;
+            matrix.m01 = vctJ.x;
+            matrix.m02 = vctK.x;
+            matrix.m03 = fltPX;
+
+            matrix.m10 = vctI.y;
+            matrix.m11 = vctJ.y;
+            matrix.m12 = vctK.y;
+            matrix.m13 = fltPY;
+
+            matrix.m20 = vctI.z;
+            matrix.m21 = vctJ.z;
+            matrix.m22 = vctK.z;
+            matrix.m23 = fltPZ;
+
+
+            transform.localScale = matrix.ExtractScale();
+            transform.rotation = matrix.ExtractRotation();
+            transform.position = matrix.ExtractPosition();
+
             if (terms.Length >= 11)
             {
                 strObjVars = terms[10];
@@ -90,7 +117,7 @@ public class ZoneObject : MonoBehaviour
             Debug.LogWarning("Exception parsing ZoneObject from line: '" + line + "': Exception: " + e.Message);
         }
 
-        transform.position = new Vector3(fltPX, fltPY, fltPZ);
+        //transform.position = new Vector3(fltPX, fltPY, fltPZ);
         DetermineMyType(strObject);
     }
 
@@ -193,9 +220,27 @@ public class ZoneObject : MonoBehaviour
 
     private void Update()
     {
-        fltPX = transform.position.x;
-        fltPY = transform.position.y;
-        fltPZ = transform.position.z;
+        //fltPX = transform.position.x;
+        //fltPY = transform.position.y;
+        //fltPZ = transform.position.z;
+
+        Matrix4x4 matrix = transform.localToWorldMatrix;
+
+        Vector3 j = new Vector3(matrix.m01, matrix.m11, matrix.m21);
+        Vector3 k = new Vector3(matrix.m02, matrix.m12, matrix.m22);
+        Vector3 p = new Vector3(matrix.m03, matrix.m13, matrix.m23);
+
+        fltJX = j.x;
+        fltJY = j.y;
+        fltJZ = j.z;
+
+        fltKX = k.x;
+        fltKY = k.y;
+        fltKZ = k.z;
+
+        fltPX = p.x;
+        fltPY = p.y;
+        fltPZ = p.z;
     }
 
     public Color GetColor()
